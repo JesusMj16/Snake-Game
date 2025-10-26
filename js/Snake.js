@@ -67,7 +67,11 @@ class Apple{
             this.audio.currentTime = 0;
             this.audio.play();
             this.audio.volume = 0.2;
+            // Aumentar la velocidad del snake cada punto
+            snake.velocity += 0.1;
+            
         }
+
     }
 }
 class SnakeBody{
@@ -196,6 +200,8 @@ class Snake{
     update(){
         if(this.isDead){
             this.transparency -= 0.01;
+            // Mantener la transparencia del cuerpo sincronizada con la cabeza durante la animación de muerte
+            this.body.forEach(e => { e.transparency = this.transparency; });
             if(this.transparency <= 0){
                 play = false;
                 menu.style.display = 'flex';
@@ -214,11 +220,41 @@ class Snake{
         this.position.x += Math.cos(this.rotation)*this.velocity;
         this.position.y += Math.sin(this.rotation)*this.velocity;
         this.collision_p();
+        // Verificar colisión con el propio cuerpo cada frame
+        this.collision_Body();
     }
     collision_p(){
         if (this.position.x - this.radio <= 0 || this.position.x + this.radio >= canvas.width || (this.position.y - this.radio <= 0 || this.position.y + this.radio >= canvas.height)){
             this.death();
         }
+    }
+    collision_Body(){
+        // Verifica colisión de la cabeza con los segmentos del cuerpo
+        // Calculamos dinámicamente cuántos segmentos saltar según el espaciado real del cuerpo
+        const hx = this.position.x;
+        const hy = this.position.y;
+        const hr = this.radio;
+
+        // Distancia mínima entre centros para considerar colisión
+        const vel = Math.max(0.1, this.velocity); // evitar división por 0
+        const rSum = hr + (this.body.length ? this.body[0].radio : hr);
+        // Saltamos los segmentos que están más cerca que el diámetro efectivo 
+        const minSegmentsBySpacing = Math.ceil((rSum + 2) / (this.pathLength * vel));
+        const skip = Math.max(4, minSegmentsBySpacing);
+        
+        for (let i = skip; i < this.body.length; i++) {
+            const seg = this.body[i];
+            const p = seg.path[seg.path.length - 1]; // posición actual dibujada del segmento
+            const dx = hx - p.x;
+            const dy = hy - p.y;
+            
+            // Usamos distancia al cuadrado para evitar sqrt
+            if ((dx * dx + dy * dy) <= (rSum * rSum)) {
+                this.death();
+                return true;
+            }
+        }
+        return false;
     }
     death(){
         this.isDead = true;
@@ -289,7 +325,7 @@ function init(length, pathLength, color){
     snake.pathLength = pathLength;
     snake.position = {x:200, y:200};
     snake.isDead = false;
-    snake.velocity = 3;
+    snake.velocity = 1;
     snake.transparency = 1;
     snake.initializeBody();
     snake.keys.enabled = true;
