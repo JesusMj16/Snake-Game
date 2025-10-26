@@ -1,0 +1,80 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap');
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Silkscreen';
+}
+body{
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: linear-gradient(90deg, #0a032b,#0a3981);
+}
+.container{
+    position: relative;
+    color: white;
+}
+
+#canvas{
+    border: 2px solid white;
+    box-shadow: 0 0 10px rgb(81, 122, 131);
+}
+.container .score{
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 24px;
+}
+.container .menu{
+    border: 2px solid white;
+    box-shadow: 0 0 10px rgb(81, 122, 131);
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    position: absolute;
+    width: 70%;
+    height: 70%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+}
+.container .menu h2{
+    font-size: 70px;
+}
+.container .character{
+    width: 70%;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+#snake-1, #snake-2{
+    border: 2px solid white;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+#snake-1:hover, #snake-2:hover{
+    background-color: rgb(255, 255, 255, 0.2);
+    transform: scale(1.1);
+    transition: all 0.3s ease;
+}
+
+
+.container .menu p{
+    font-size: 15px;
+    animation: parpadeo 1s infinite;
+}
+@keyframes parpadeo{
+    0% {opacity: 1;}
+    50% {opacity: 0;}
+    100% {opacity: 1;}
+}
