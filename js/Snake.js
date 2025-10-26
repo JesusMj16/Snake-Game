@@ -7,6 +7,7 @@ const score = document.querySelector('.score');
 const timer = document.querySelector('.timer');
 const canvas2 = document.getElementById('snake-1');
 const canvas3 = document.getElementById('snake-2');
+const colores = ['#ff5733ff', '#33ff57ff', '#3357ffff', '#f1c40fff', '#9b59b6ff'];
 
 
 
@@ -68,7 +69,7 @@ class Apple{
             this.audio.play();
             this.audio.volume = 0.2;
             // Aumentar la velocidad del snake cada punto
-            snake.velocity += 0.1;
+            snake.velocity += 0.03;
             
         }
 
@@ -200,7 +201,6 @@ class Snake{
     update(){
         if(this.isDead){
             this.transparency -= 0.01;
-            // Mantener la transparencia del cuerpo sincronizada con la cabeza durante la animación de muerte
             this.body.forEach(e => { e.transparency = this.transparency; });
             if(this.transparency <= 0){
                 play = false;
@@ -220,7 +220,6 @@ class Snake{
         this.position.x += Math.cos(this.rotation)*this.velocity;
         this.position.y += Math.sin(this.rotation)*this.velocity;
         this.collision_p();
-        // Verificar colisión con el propio cuerpo cada frame
         this.collision_Body();
     }
     collision_p(){
@@ -248,13 +247,12 @@ class Snake{
             const dx = hx - p.x;
             const dy = hy - p.y;
             
-            // Usamos distancia al cuadrado para evitar sqrt
             if ((dx * dx + dy * dy) <= (rSum * rSum)) {
                 this.death();
                 return true;
             }
         }
-        
+
         return false;
     }
     death(){
@@ -319,6 +317,8 @@ canvas2.addEventListener('click', () => {
 canvas3.addEventListener('click', () => {
     init(8, 5, "#33ff57ff");
 });
+
+// Inicializacion del juego
 function init(length, pathLength, color){
     snake.body.length = 0;
     snake.length = length;
