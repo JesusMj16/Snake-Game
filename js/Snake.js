@@ -1,10 +1,13 @@
 const canvas  = document.getElementById('canvas');
-
+const audio_Fondo = new Audio('audio/fondo.mp3');
+const audio_colision = new Audio('audio/collision.mp3');
 const ctx = canvas.getContext('2d');
 const menu = document.querySelector('.menu');
 const score = document.querySelector('.score');
+const timer = document.querySelector('.timer');
 const canvas2 = document.getElementById('snake-1');
 const canvas3 = document.getElementById('snake-2');
+
 
 
 
@@ -19,15 +22,17 @@ canvas3.height = 100;
 
 let play = false;
 let scoreP = 0;
+let timeP = 0;
 
 canvas.width = 900;
 canvas.height = 600;
 class Apple{
-    constructor(position, radio, color, context){
+    constructor(position, radio, color, context, audio){
         this.position = position;
         this.radio = radio;
         this.color = color;
         this.context = context;
+        this.audio = audio;
     }
     draw(){
         this.context.save();
@@ -59,6 +64,9 @@ class Apple{
             snake.createBody();
             scoreP += 1;
             score.textContent = `Score: ${scoreP}`;
+            this.audio.currentTime = 0;
+            this.audio.play();
+            this.audio.volume = 0.2;
         }
     }
 }
@@ -261,7 +269,7 @@ class Snake{
 
 const snake = new Snake({x:200, y:200}, 17, "#456190ff", 1, 3, 12, ctx);
 snake.initializeBody();
-const apple = new Apple({x:400, y:300}, 11, "red", ctx);
+const apple = new Apple({x:400, y:300}, 11, "red", ctx, audio_colision);
 const snakeP1 = new Snake({x:165, y:40}, 17, "#ff5733ff", 1.5, 8, 12, ctx2);
 snakeP1.initializeBody();
 snakeP1.drawCharacter();
@@ -281,14 +289,19 @@ function init(length, pathLength, color){
     snake.pathLength = pathLength;
     snake.position = {x:200, y:200};
     snake.isDead = false;
-    snake.velocity = 1;
+    snake.velocity = 3;
     snake.transparency = 1;
     snake.initializeBody();
     snake.keys.enabled = true;
     play = true;
     menu.style.display = 'none';
     scoreP = 0;
+    timeP = 0;
+    timer.textContent = `00:00`;
     score.textContent = `Score: ${scoreP}`;
+    audio_Fondo.currentTime = 0;
+    audio_Fondo.play();
+    audio_Fondo.volume = 0.2;
 
 }
 //Dibujado del fondo del juego
@@ -311,6 +324,13 @@ function update(){
         snake.update();
         apple.draw();
         apple.collition(snake);
+        // Actualizacion del timer
+        timeP += 1/60;
+        let minutes = Math.floor(timeP / 60);
+        let seconds = Math.floor(timeP % 60);
+        let minutesText = minutes < 10 ? `0${minutes}` : minutes;
+        let secondsText = seconds < 10 ? `0${seconds}` : seconds;
+        timer.textContent = `${minutesText}:${secondsText}`;
     }
     requestAnimationFrame(update);
 }

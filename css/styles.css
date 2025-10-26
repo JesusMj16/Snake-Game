@@ -27,7 +27,15 @@ body{
 .container .score{
     position: absolute;
     top: -40px;
-    left: 50%;
+    left: 10%;
+    transform: translateX(-50%);
+    font-size: 24px;
+}
+
+.container .timer{
+    position: absolute;
+    top: -40px;
+    left: 90%;
     transform: translateX(-50%);
     font-size: 24px;
 }
