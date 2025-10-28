@@ -7,12 +7,15 @@ const score = document.querySelector('.score');
 const timer = document.querySelector('.timer');
 const canvas2 = document.getElementById('snake-1');
 const canvas3 = document.getElementById('snake-2');
+const bestScoreDisplay = document.querySelector('.best-score');
+
+// colores que pude tener la manzana, por el momento solo agrego estos si lo quisiera expandir podria agregar mas colores
 const colores = ['#ff5733ff', '#33ff57ff', '#3357ffff', '#f1c40fff', '#9b59b6ff'];
 
 
 
-
-const ctx2 = canvas2.getContext('2d');
+// Canvas para seleccionar personajes
+const ctx2 = canvas2.getContext('2d'); 
 const ctx3 = canvas3.getContext('2d');
 
 canvas2.width = 250;
@@ -21,12 +24,15 @@ canvas2.height = 100;
 canvas3.width = 250;
 canvas3.height = 100;
 
+//Variables de inicio 
 let play = false;
 let scoreP = 0;
 let timeP = 0;
 
+//canvas principal donde se alojara el juego
 canvas.width = 900;
 canvas.height = 600;
+//-------------------CLASES-----------------------//
 class Apple{
     constructor(position, radio, color, context, audio){
         this.position = position;
@@ -51,10 +57,12 @@ class Apple{
             x: this.position.x - snake.position.x,
             y: this.position.y - snake.position.y
         }
+        // distancia con el teorema de pitagoras
         let distance = Math.sqrt(
             (v.x * v.x) + (v.y * v.y)
         );
-
+        // Si la distancia es menor que la suma de los radios esto nos dice que hay una colision, la misma logica aplicare para la colision
+        //con las paredes y el cuerpo del snake
         if(distance < this.radio + snake.radio){
             this.position = {
                 x: Math.floor(Math.random() *
@@ -62,6 +70,8 @@ class Apple{
                 y: Math.floor(Math.random() * 
                 ((canvas.height - this.radio) - this.radio + 1) ) + this.radio,
             }
+            // Diferentes colores para la manzana
+            this.color = colores[Math.floor(Math.random() * colores.length)];
             snake.createBody();
             scoreP += 1;
             score.textContent = `Score: ${scoreP}`;
@@ -69,12 +79,14 @@ class Apple{
             this.audio.play();
             this.audio.volume = 0.2;
             // Aumentar la velocidad del snake cada punto
-            snake.velocity += 0.03;
+            snake.velocity += 0.04;
             
         }
 
     }
 }
+
+// Clase para cada segmento del cuerpo de la serpiente
 class SnakeBody{
     constructor(radio, color, context, path){
         this.radio = radio;
@@ -90,12 +102,13 @@ class SnakeBody{
         this.context.fillStyle = color;
         this.context.globalAlpha = this.transparency; // 1 opaco 0 transparente
         this.context.shadowColor = this.color;
-        this.context.shadowBlur = 20;
+        this.context.shadowBlur = 10;
         this.context.fill();
         this.context.closePath(); //Cerramos la figura  
         this.context.restore();
     }
     draw(){
+        // dibuja el segmento en la última posición de su path, esto crea el efecto de seguir a la cabeza donde slice funciona para obtener el ultimo elemento del array
         this.drawCircle(this.path.slice(-1)[0].x , this.path.slice(-1)[0].y, this.radio, this.color);
     }
 }
@@ -218,7 +231,7 @@ class Snake{
             this.rotation += 0.04;
         }
         this.position.x += Math.cos(this.rotation)*this.velocity;
-        this.position.y += Math.sin(this.rotation)*this.velocity;
+        this.position.y += Math.sin(this.rotation)*this.velocity ;
         this.collision_p();
         this.collision_Body();
     }
@@ -266,6 +279,11 @@ class Snake{
             }
             e.transparency = this.transparency;
         });
+        // Guardar el mejor puntaje en el almacenamiento local
+        let bestScore = localStorage.getItem('bestScore') || 0;
+        if(scoreP > bestScore){
+            localStorage.setItem('bestScore', scoreP);
+        }
     }
     drawCharacter(){
         for(let i = 0 ; i < this.length ; i++){
@@ -320,6 +338,7 @@ canvas3.addEventListener('click', () => {
 
 // Inicializacion del juego
 function init(length, pathLength, color){
+    bestScoreDisplay.textContent = `Best: ${localStorage.getItem('bestScore') || 0}`;
     snake.body.length = 0;
     snake.length = length;
     snake.color = color;
@@ -342,13 +361,13 @@ function init(length, pathLength, color){
 
 }
 //Dibujado del fondo del juego
-function background(){
-    ctx.fillStyle = "#717170ff";
+function background() { 
+    ctx.fillStyle = "rgba(113, 113, 112, 0.2)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    for(let i = 0 ; i < canvas.height; i += 50){
-        for(let j = 0; j < canvas.width; j += 50){
-            ctx.fillStyle = "#000000ff";
+    for (let i = 0; i < canvas.height; i += 50) {
+        for (let j = 0; j < canvas.width; j += 50) {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
             ctx.fillRect(j + 3, i + 3, 45, 45);
         }
     }
